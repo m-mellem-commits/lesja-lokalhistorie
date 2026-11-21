@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oppdater data – Lesja lokalhistorie</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  main{max-width:820px}
+  .steg{display:flex;gap:10px;align-items:center;margin:8px 0}
+  .steg button{background:var(--fjell);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:.95rem}
+  .steg button:disabled{opacity:.5;cursor:default}
+  #logg{background:#1f2a2e;color:#d9e6e3;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:12px;border-radius:10px;height:300px;overflow:auto;white-space:pre-wrap}
+  .last a{display:inline-block;margin:4px 8px 4px 0}
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-bilde" style="background-image:url('../img/gronnefossen-lesjaskog.jpg')"></div><div class="hero-indre"><a class="logo" href="../index.html"><span>Lesja <em>lokalhistorie</em> – oppdater data</span></a></div></header>
+<main>
+  <div class="boks">
+    <h2>Slik oppdaterer du registeret</h2>
+    <ol>
+      <li>Klikk <b>Hent alt</b> (tar 2–5 minutter, krever nettilgang).</li>
+      <li>Last ned filene som dukker opp under.</li>
+      <li>Erstatt filene med samme navn i mappen <code>data/</code>.</li>
+      <li>Last siden på nytt. Hvis du bruker GitHub: gjør <code>commit</code> og <code>push</code>.</li>
+    </ol>
+    <p class="hjelp">Digitalarkivet-listen (<code>arkiv.js</code>) kan ikke hentes automatisk fra nettleseren og oppdateres for hånd ved behov. <code>egne.js</code> og <code>kilder.js</code> røres ikke.</p>
+  </div>
+  <div class="steg"><button id="alt">Hent alt</button><button id="wiki">Kun Lokalhistoriewiki</button><button id="steder">Kun stedsnavn og gnr</button><button id="nb">Kun Nasjonalbiblioteket</button></div>
+  <div id="logg"></div>
+  <div class="last" id="last"></div>
+</main>
+<script>
+const KNR = "3432";
+const logg = (t) => { const el = document.getElementById("logg"); el.textContent += t + "\n"; el.scrollTop = 1e9; };
+const J = async (u) => { for (let i = 0; i < 3; i++) { try { const r = await fetch(u); if (r.ok) return r.json(); } catch (e) {} await new Promise(r => setTimeout(r, 800)); } throw new Error("Klarte ikke å hente " + u); };
+const idag = () => new Date().toLocaleDateString("nb-NO", { day: "2-digit", month: "2-digit", year: "numeric" });
+function lastNed(navn, kommentar, variabel, data, ekstra = "") {
+  const tekst = `// ${kommentar}\n// Generert ${idag()}. Kan oppdateres med verktoy/oppdater-data.html\nwindow.${variabel} = ${JSON.stringify(data)};\n${ekstra}`;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([tekst], { type: "text/javascript" }));
+  a.download = navn; a.textContent = "⬇ " + navn + ` (${Math.round(tekst.length / 1024)} kB)`;
+  document.getElementById("last").appendChild(a);
+}
+
+async function hentWiki() {
+  const api = "https://lokalhistoriewiki.no/api.php";
+  const q = (p) => J(api + "?" + new URLSearchParams({ format: "json", formatversion: 2, origin: "*", ...p }));
+  logg("Lokalhistoriewiki: henter kategorier …");
+  const start = ["Kategori:Lesja kommune"];
+  (await q({ action: "query", list: "allcategories", acprefix: "Lesja", aclimit: 500 })).query.allcategories.forEach(c => start.push("Kategori:" + c.category));
+  const sider = new Map(), sett = new Set(), ko = [...start];
+  while (ko.length && sett.size < 400) {
+    const kat = ko.shift(); if (sett.has(kat)) continue; sett.add(kat);
+    let cont = {};
+    do {
+      const r = await q({ action: "query", list: "categorymembers", cmtitle: kat, cmlimit: 500, cmtype: "page|subcat", ...cont });
+      r.query.categorymembers.forEach(m => { if (m.ns === 14) ko.push(m.title); else if (m.ns === 0) sider.set(m.title, 1); });
+      cont = r.continue || null;
+    } while (cont);
+  }
+  logg(`  ${sett.size} kategorier, ${sider.size} sider i kategoriene.`);
+  let off = 0;
+  while (off !== undefined && off < 2000) {
+    const r = await q({ action: "query", list: "search", srsearch: "Lesja", srlimit: 500, sroffset: off, srnamespace: 0 });
+    r.query.search.forEach(x => { if (!sider.has(x.title)) sider.set(x.title, 0); });
+    off = r.continue ? r.continue.sroffset : undefined;
+  }
+  logg(`  ${sider.size} sider totalt etter fulltekstsøk. Henter utdrag …`);
+  const titler = [...sider.keys()], ut = [];
+  const skip = /^(Artikler|Sider|Wikidata|Personer$|Gudbrandsdalen$|Lesja kommune$)/;
+  for (let i = 0; i < titler.length; i += 20) {
+    const r = await q({ action: "query", titles: titler.slice(i, i + 20).join("|"), prop: "categories|extracts", cllimit: 500, clshow: "!hidden", exintro: 1, explaintext: 1, exchars: 300, exlimit: 20, redirects: 1 });
+    const redir = {}; (r.query.redirects || []).forEach(x => redir[x.to] = x.from);
+    r.query.pages.forEach(p => {
+      if (p.missing) return;
+      const t = p.title, k = sider.get(redir[t] || t) ?? 0;
+      const m = t.match(/\((\S[\S ]*?) gnr\.? ?([\d/]+)\)/);
+      if (m && m[1] !== "Lesja") return;
+      const cats = (p.categories || []).map(c => c.title.replace("Kategori:", "")).filter(c => !skip.test(c));
+      const person = cats.some(c => /^(Fødsler|Dødsfall) i/.test(c));
+      const o = { t, k, y: person ? "person" : (m ? "gard" : "emne"), c: cats.filter(c => !/^(Fødsler|Dødsfall) i/.test(c)).slice(0, 6), e: (p.extract || "").replace(/\s+/g, " ").trim().slice(0, 140) };
+      const f = cats.find(c => c.startsWith("Fødsler i")), d = cats.find(c => c.startsWith("Dødsfall i"));
+      if (f || d) o.l = (f ? f.replace(/\D/g, "") : "?") + "–" + (d ? d.replace(/\D/g, "") : "");
+      if (m) o.g = m[2];
+      ut.push(o);
+    });
+    if (i % 100 === 0) logg(`  … ${i}/${titler.length}`);
+  }
+  ut.sort((a, b) => b.k - a.k || a.t.localeCompare(b.t, "no"));
+  lastNed("wiki.js", "Artikler fra lokalhistoriewiki.no knyttet til Lesja", "LH_WIKI", ut, `window.LH_DATADATO = "${idag()}";\n`);
+  logg(`Lokalhistoriewiki ferdig: ${ut.length} artikler.`);
+}
+
+async function hentSteder() {
+  logg("Kartverket: henter stedsnavn i Lesja …");
+  const map = new Map();
+  for (const L of "abcdefghijklmnopqrstuvwxyzæøå") {
+    let side = 1, tot = 1;
+    while ((side - 1) * 500 < tot && side < 10) {
+      const j = await J(`https://api.kartverket.no/stedsnavn/v1/navn?sok=${encodeURIComponent(L + "*")}&knr=${KNR}&treffPerSide=500&side=${side}`);
+      if (!j.navn) break; tot = j.metadata.totaltAntallTreff;
+      j.navn.forEach(n => { if (n.kommuner.some(k => k.kommunenummer === KNR)) map.set(n.stedsnummer + "|" + n.skrivemåte, n); });
+      side++;
+    }
+  }
+  const navn = [...map.values()];
+  logg(`  ${navn.length} navn. Slår opp gnr/bnr for gårder og setre …`);
+  const med = new Set(["Gard", "Bruk", "Eiendom", "Navnegard", "Seter/støl", "Setervoll", "Støls-/setereiendom", "Gammel bosettingsplass", "Allmenning", "Tuft", "Fritidsbolig", "Enebolig/mindre boligbygg", "Bygg for jordbruk, fiske og fangst"]);
+  const liste = navn.filter(n => med.has(n.navneobjekttype));
+  for (let i = 0; i < liste.length; i += 8) {
+    await Promise.all(liste.slice(i, i + 8).map(async n => {
+      const p = n.representasjonspunkt;
+      try {
+        const j = await J(`https://api.kartverket.no/eiendom/v1/punkt?nord=${p.nord}&ost=${p["øst"]}&koordsys=4258&radius=30&treffPerSide=10`);
+        const e = (j.eiendom || []).filter(x => x.kommunenummer === KNR).sort((a, b) => a.meterFraPunkt - b.meterFraPunkt);
+        n._mat = e.length ? [...new Set(e.filter(x => x.meterFraPunkt <= e[0].meterFraPunkt + 1).map(x => x.matrikkelnummertekst))] : [];
+      } catch (err) { n._mat = []; }
+    }));
+    if (i % 80 === 0) logg(`  … ${i}/${liste.length}`);
+  }
+  // «109/3,5» og «51/1-2,4» betyr flere bruk på samme teig – gjør om til 109/3, 109/5 osv.
+  const normMat = (liste) => {
+    const ut = []; let cur = null;
+    liste.join(",").split(",").map(t => t.trim()).filter(Boolean).forEach(tok => {
+      let b = tok;
+      if (tok.includes("/")) [cur, b] = tok.split("/");
+      if (cur === null) return;
+      const r = b.match(/^(\d+)-(\d+)$/);
+      if (r) for (let i = +r[1]; i <= +r[2]; i++) ut.push(cur + "/" + i); else ut.push(cur + "/" + b);
+    });
+    return [...new Set(ut)];
+  };
+  liste.forEach(n => { if (n._mat) n._mat = normMat(n._mat); });
+  const typer = [...new Set(navn.map(n => n.navneobjekttype))];
+  const S = navn.map(n => { const r = [n.skrivemåte, typer.indexOf(n.navneobjekttype), +n.representasjonspunkt.nord.toFixed(4), +n.representasjonspunkt["øst"].toFixed(4), n.stedsnummer]; if (n._mat && n._mat.length) r.push(n._mat.join(",")); return r; })
+    .sort((a, b) => a[0].localeCompare(b[0], "no"));
+  lastNed("steder.js", "Stedsnavn i Lesja (knr 3432) fra Kartverkets sentrale stedsnavnregister (SSR). Format: [navn, typeindeks, nord, øst, stedsnummer, gnr/bnr]", "LH_STEDER", { typer, navn: S });
+  logg(`Stedsnavn ferdig: ${S.length} navn.`);
+}
+
+async function hentNB() {
+  logg("Nasjonalbiblioteket: henter bøker, tidsskrift og kart …");
+  const res = new Map();
+  for (const [mt, sider] of [["bøker", 15], ["tidsskrift", 6], ["kart", 3]]) {
+    for (let p = 0; p < sider; p++) {
+      const j = await J(`https://api.nb.no/catalog/v1/items?q=Lesja&filter=mediatype:${encodeURIComponent(mt)}&size=100&page=${p}`);
+      ((j._embedded && j._embedded.items) || []).forEach(x => {
+        const m = x.metadata, geo = [...(m.subject?.geographics || []), ...(m.subject?.topics || []), ...(m.subjectName || []), ...(m.series || [])].join(" ");
+        if (!/lesja/i.test(m.title + " " + geo)) return;
+        res.set(x.id, { t: m.title, a: (m.creators || []).slice(0, 3).join("; "), y: m.originInfo?.issued || "", m: { "bøker": "bok", tidsskrift: "tidsskrift", kart: "kart" }[mt], u: m.identifiers?.urn || x.id, x: x.accessInfo?.accessAllowedFrom || "" });
+      });
+      if (p + 1 >= j.page.totalPages) break;
+    }
+  }
+  const ut = [...res.values()].sort((a, b) => (a.m !== "bok") - (b.m !== "bok") || a.t.localeCompare(b.t, "no"));
+  lastNed("nb.js", "Bøker, tidsskrifter og kart i Nasjonalbiblioteket med Lesja i tittel eller emne", "LH_NB", ut);
+  logg(`Nasjonalbiblioteket ferdig: ${ut.length} titler.`);
+}
+
+const knapper = [...document.querySelectorAll(".steg button")];
+async function kjør(fns) {
+  knapper.forEach(b => b.disabled = true);
+  try { for (const f of fns) await f(); logg("\nFerdig. Last ned filene over og legg dem i data/-mappen."); }
+  catch (e) { logg("FEIL: " + e.message); }
+  knapper.forEach(b => b.disabled = false);
+}
+document.getElementById("alt").onclick = () => kjør([hentWiki, hentSteder, hentNB]);
+document.getElementById("wiki").onclick = () => kjør([hentWiki]);
+document.getElementById("steder").onclick = () => kjør([hentSteder]);
+document.getElementById("nb").onclick = () => kjør([hentNB]);
+</script>
+</body>
+</html>

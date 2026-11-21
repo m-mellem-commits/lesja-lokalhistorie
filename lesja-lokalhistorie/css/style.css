@@ -1,0 +1,227 @@
+/* Lesja lokalhistorie – fargene er hentet fra Selmers sepiafoto av Grønnefossen */
+:root{
+  --papir:#f5f0e6; --papir-2:#ece4d4; --kort:#fffcf6; --blekk:#2a241d; --dempet:#6f6556; --linje:#e3d9c6;
+  --gran:#2e4a3f; --gran-mork:#1f332b; --gran-lys:#e4ece6;
+  --rust:#a8552a; --rust-mork:#8a4220; --sepia:#8c6a46; --gull:#d9a95f;
+  --person:#7a4a6e; --gard:#55702f; --seter:#8a7a2a; --sted:#3c6a7a; --artikkel:#2e4a3f; --litt:#9a5b2a; --arkiv:#8a3b33; --egen:#5d5d5d;
+  --r:14px; --r-liten:9px;
+  --skygge:0 1px 2px rgba(60,40,20,.06),0 4px 14px rgba(60,40,20,.06);
+  --skygge-hover:0 2px 4px rgba(60,40,20,.08),0 12px 28px rgba(60,40,20,.12);
+  --serif:"Fraunces","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--papir);color:var(--blekk);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.35;
+  background-image:radial-gradient(rgba(120,90,50,.08) 1px,transparent 1px);background-size:4px 4px}
+a{color:var(--gran);text-decoration-color:rgba(46,74,63,.35);text-underline-offset:2px}
+a:hover{color:var(--rust);text-decoration-color:currentColor}
+.skjult{position:absolute;left:-9999px}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;letter-spacing:-.01em}
+::selection{background:#f1d3a8}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;color:#fff;overflow:hidden;background:#3a2e22;isolation:isolate;transition:min-height .35s ease}
+.hero-bilde{position:absolute;inset:0;z-index:-2;background:url("../img/gronnefossen-lesjaskog.jpg") center 58%/cover no-repeat;transform:scale(1.04);filter:saturate(.95) contrast(1.05)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(24,18,12,.55) 0%,rgba(24,18,12,.15) 38%,rgba(24,18,12,.35) 65%,rgba(24,18,12,.82) 100%),
+             linear-gradient(90deg,rgba(24,18,12,.55) 0%,rgba(24,18,12,0) 60%)}
+.hero-indre{width:100%;min-width:0;max-width:1200px;margin:0 auto;padding:20px 24px 26px;display:flex;flex-direction:column;gap:14px}
+.logo{display:inline-flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-family:var(--serif);font-size:1.3rem;font-weight:600;align-self:flex-start}
+.logo:hover{color:#fff}
+.logo em{font-style:italic;font-weight:400;opacity:.9}
+.logo svg{width:34px;height:34px;color:var(--gull);filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+.hero-tekst{display:none;max-width:720px;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+.hero-overtittel{margin:0;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gull);font-weight:600}
+.hero h1{font-size:clamp(2.1rem,4.6vw,3.6rem);margin:.15em 0 .25em;font-weight:600}
+.hero-ingress{margin:0;font-size:1.12rem;max-width:56ch;color:#f3eadc}
+.sok{position:relative;display:flex;max-width:760px;width:100%;background:#fff;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:5px}
+.sok-ikon{position:absolute;left:20px;top:50%;width:20px;height:20px;transform:translateY(-50%);color:var(--dempet)}
+.sok input{flex:1;min-width:0;border:0;background:transparent;padding:12px 12px 12px 48px;font:500 1.02rem var(--sans);color:var(--blekk);border-radius:999px}
+.sok input:focus{outline:none}
+.sok:focus-within{box-shadow:0 0 0 4px rgba(217,169,95,.55),0 10px 30px rgba(0,0,0,.28)}
+.sok button{border:0;border-radius:999px;background:var(--rust);color:#fff;font:600 1rem var(--sans);padding:0 26px;cursor:pointer;transition:background .15s}
+.sok button:hover{background:var(--rust-mork)}
+.fotokreditt{position:absolute;right:14px;bottom:8px;font-size:.72rem;color:rgba(255,255,255,.72);text-decoration:none;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.fotokreditt:hover{color:#fff}
+
+body.pa-forside .hero{min-height:min(78vh,640px);display:flex;align-items:stretch}
+body.pa-forside .hero-indre{flex:1;justify-content:space-between;padding-top:24px;padding-bottom:70px}
+body.pa-forside .hero-tekst{display:block;margin-top:auto}
+body.pa-forside .hero-bilde{background-position:center 55%}
+
+/* ---------- Navigasjon ---------- */
+.navlinje{position:sticky;top:0;z-index:30;background:rgba(31,51,43,.97);backdrop-filter:blur(6px);box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.faner{max-width:1200px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.faner::-webkit-scrollbar{display:none}
+.faner button{background:none;border:0;color:#c9d6cf;padding:13px 13px;font:500 .92rem var(--sans);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.faner button:hover{color:#fff}
+.faner button.aktiv{color:#fff;border-bottom-color:var(--gull)}
+
+main{max-width:1200px;margin:0 auto;padding:30px 24px 50px}
+
+/* ---------- Forside ---------- */
+.talband{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 0 34px;position:relative;z-index:2}
+.talband button{background:var(--kort);border:0;border-radius:var(--r);padding:16px 16px 14px;text-align:left;cursor:pointer;box-shadow:var(--skygge-hover);transition:transform .15s,box-shadow .15s;border-top:4px solid var(--farge,var(--gran));font:inherit;color:inherit}
+.talband button:hover{transform:translateY(-3px)}
+.talband b{display:block;font:600 1.9rem/1 var(--serif);color:var(--farge,var(--gran))}
+.talband span{font-size:.84rem;color:var(--dempet)}
+.forside-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:start}
+.etikett{font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rust);font-weight:600;margin:0 0 6px}
+.forside-grid h2{font-size:1.7rem;margin:0 0 .4em}
+.ingress{color:var(--dempet);max-width:62ch;margin:0 0 1em}
+.eksempel{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.eksempel button{background:var(--kort);border:1px solid var(--linje);color:var(--gran-mork);border-radius:999px;padding:6px 14px;cursor:pointer;font:500 .9rem var(--sans);transition:all .15s}
+.eksempel button:hover{background:var(--gran);border-color:var(--gran);color:#fff}
+.tips{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 0}
+.tips div{background:var(--papir-2);border-radius:var(--r-liten);padding:12px 14px;font-size:.88rem;color:var(--dempet)}
+.tips b{display:block;color:var(--blekk);font-family:var(--serif);font-size:1rem;margin-bottom:2px}
+.boks{background:var(--kort);border:1px solid var(--linje);border-radius:var(--r);padding:18px 20px;margin-bottom:18px;box-shadow:var(--skygge)}
+.boks h2,.boks h3{margin:.05em 0 .55em;font-size:1.2rem}
+.boks ul{margin:0;padding-left:0;list-style:none}
+.boks li{margin:0;padding:6px 0;border-bottom:1px dashed var(--linje)}
+.boks li:last-child{border-bottom:0}
+.bokliste li{display:flex;gap:12px;align-items:baseline}
+.bokliste .bd{flex:none;font:600 .78rem var(--sans);color:#fff;background:var(--sepia);border-radius:6px;padding:2px 7px}
+.seksjonstittel{display:flex;align-items:baseline;gap:14px;margin:42px 0 14px}
+.seksjonstittel h2{margin:0;font-size:1.6rem}
+.seksjonstittel::after{content:"";flex:1;height:1px;background:var(--linje);order:2}
+.seksjonstittel .knapp-lenke{order:3;white-space:nowrap}
+.blagrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.blakort{position:relative;overflow:hidden;background:var(--kort);border:1px solid var(--linje);border-radius:var(--r);padding:20px 20px 18px 74px;cursor:pointer;text-align:left;font:inherit;color:inherit;box-shadow:var(--skygge);transition:transform .15s,box-shadow .15s,border-color .15s;min-height:96px}
+.blakort:hover{transform:translateY(-3px);box-shadow:var(--skygge-hover);border-color:#d5c4a6}
+.blakort .ikon{position:absolute;left:18px;top:20px;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--farge,var(--gran));color:#fff}
+.blakort .ikon svg{width:22px;height:22px}
+.blakort b{display:block;font-family:var(--serif);font-size:1.15rem;margin-bottom:2px}
+.blakort span{font-size:.88rem;color:var(--dempet)}
+
+/* ---------- Resultater ---------- */
+.resultat-kolonner{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:30px;align-items:start}
+.sokestatus{margin:0 0 20px;color:var(--dempet)}
+.sokestatus b{color:var(--blekk);font-family:var(--serif);font-size:1.5rem;font-weight:600;display:block}
+.seksjon{margin-bottom:30px}
+.seksjon-topp{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.seksjon-topp h2{margin:0;font-size:1.3rem}
+.seksjon-topp small{background:var(--papir-2);color:var(--dempet);border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:500}
+.seksjon-topp::after{content:"";flex:1;height:1px;background:var(--linje);order:3}
+.treff{background:var(--kort);border:1px solid var(--linje);border-left:4px solid var(--farge,var(--gran));border-radius:var(--r-liten);padding:12px 16px;margin-bottom:9px;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--skygge);transition:box-shadow .15s,transform .15s}
+.treff:hover{box-shadow:var(--skygge-hover);transform:translateX(2px)}
+.t-person{--farge:var(--person)} .t-gard{--farge:var(--gard)} .t-seter{--farge:var(--seter)} .t-sted{--farge:var(--sted)}
+.t-artikkel{--farge:var(--artikkel)} .t-litt{--farge:var(--litt)} .t-arkiv{--farge:var(--arkiv)} .t-egen{--farge:var(--egen)}
+.merke{flex:none;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--farge);background:color-mix(in srgb,var(--farge) 12%,transparent);border-radius:999px;padding:3px 9px;margin-top:3px;min-width:74px;text-align:center}
+.m-person{--farge:var(--person)} .m-gard{--farge:var(--gard)} .m-seter{--farge:var(--seter)} .m-sted{--farge:var(--sted)}
+.m-artikkel{--farge:var(--artikkel)} .m-litt{--farge:var(--litt)} .m-arkiv{--farge:var(--arkiv)} .m-egen{--farge:var(--egen)}
+.treff-tekst{min-width:0;flex:1}
+.treff-tittel{font-weight:600;font-family:var(--serif);font-size:1.1rem;line-height:1.3}
+.treff-tittel a,.treff-tittel .knapp-lenke{text-decoration:none;color:var(--blekk)}
+.treff-tittel a:hover,.treff-tittel .knapp-lenke:hover{color:var(--rust)}
+.treff-meta{font-size:.84rem;color:var(--dempet);margin-top:1px}
+.treff-utdrag{font-size:.9rem;margin-top:5px;color:#4a4236}
+.gnr{font:500 .8rem ui-monospace,Menlo,Consolas,monospace;background:#edf1e3;color:#45601f;border:1px solid #d9e2c6;border-radius:6px;padding:0 6px;white-space:nowrap;vertical-align:1px}
+.knapp-lenke{background:none;border:0;padding:0;color:var(--gran);cursor:pointer;font:inherit;text-decoration:underline;text-decoration-color:rgba(46,74,63,.35);text-underline-offset:2px}
+.knapp-lenke:hover{color:var(--rust)}
+.vis-flere{background:transparent;border:1.5px dashed #cdbd9f;border-radius:var(--r-liten);width:100%;padding:10px;color:var(--gran);cursor:pointer;font:500 .92rem var(--sans)}
+.vis-flere:hover{background:var(--kort);border-style:solid}
+.ingen{color:var(--dempet);font-style:italic}
+mark{background:#f6dcb4;color:inherit;border-radius:2px;padding:0}
+
+/* ---------- Live-panel ---------- */
+#live{position:sticky;top:64px;max-height:calc(100vh - 84px);overflow:auto;padding:18px;background:var(--papir-2);border-radius:var(--r);scrollbar-width:thin}
+#live h2{font-size:1.2rem;margin:0}
+#live h3{font-size:1rem;margin:20px 0 8px}
+.hjelp{font-size:.84rem;color:var(--dempet);margin:.2em 0 .9em}
+.livebox{background:var(--kort);border:1px solid var(--linje);border-radius:var(--r-liten);padding:11px 13px;margin-bottom:10px}
+.livebox h4{margin:0 0 6px;font:600 .9rem var(--sans);display:flex;justify-content:space-between;gap:8px;color:var(--gran-mork)}
+.livebox h4 small{font-weight:500}
+.livebox ol{margin:0;padding-left:18px;font-size:.88rem}
+.livebox li{margin:5px 0}
+.livebox .u{color:var(--dempet);font-size:.8rem;display:block}
+.laster{color:var(--dempet);font-size:.85rem}
+.laster::after{content:"";display:inline-block;width:10px;height:10px;margin-left:6px;border:2px solid #d3c5ab;border-top-color:var(--rust);border-radius:50%;animation:snu .8s linear infinite;vertical-align:-1px}
+@keyframes snu{to{transform:rotate(360deg)}}
+.dyplenker{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px}
+.dyplenker a{display:inline-block;background:var(--kort);border:1px solid var(--linje);border-radius:999px;padding:4px 11px;font-size:.82rem;text-decoration:none}
+.dyplenker a:hover{background:var(--gran);border-color:var(--gran);color:#fff}
+
+/* ---------- Detaljvindu ---------- */
+.detalj{position:fixed;inset:0;background:rgba(30,22,14,.55);backdrop-filter:blur(3px);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:6vh 14px;overflow:auto;animation:inn .18s ease}
+@keyframes inn{from{opacity:0}}
+.detalj-boks{background:var(--papir);border-radius:18px;max-width:780px;width:100%;padding:28px 30px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.35);animation:opp .22s ease}
+@keyframes opp{from{transform:translateY(14px);opacity:0}}
+.detalj h2{margin:6px 0 4px;font-size:1.9rem}
+.lukk{position:absolute;right:14px;top:10px;border:0;background:var(--papir-2);width:36px;height:36px;border-radius:50%;font-size:1.4rem;line-height:1;cursor:pointer;color:var(--dempet)}
+.lukk:hover{background:var(--rust);color:#fff}
+.knapperad{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.knapperad a{background:var(--gran);color:#fff;text-decoration:none;padding:7px 14px;border-radius:999px;font-size:.88rem;font-weight:500}
+.knapperad a:hover{background:var(--rust);color:#fff}
+.tabell{width:100%;border-collapse:collapse;font-size:.92rem}
+.tabell td,.tabell th{border-bottom:1px solid var(--linje);padding:6px 6px;text-align:left;vertical-align:top}
+.tabell th{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--dempet);font-weight:600}
+
+/* ---------- Bilder ---------- */
+.bilde-topp{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.bilde-topp .sokestatus{margin:0}
+.bildekilder{display:flex;flex-wrap:wrap;gap:6px}
+.bildekilder button{background:var(--kort);border:1px solid var(--linje);border-radius:999px;padding:6px 14px;font:500 .86rem var(--sans);color:var(--gran-mork);cursor:pointer}
+.bildekilder button.aktiv,.bildekilder button:hover{background:var(--gran);border-color:var(--gran);color:#fff}
+.galleri{columns:4 240px;column-gap:14px}
+.bildekort{display:block;width:100%;break-inside:avoid;margin:0 0 14px;padding:0;border:0;background:var(--kort);border-radius:var(--r-liten);overflow:hidden;cursor:zoom-in;box-shadow:var(--skygge);text-align:left;font:inherit;color:inherit;transition:transform .15s,box-shadow .15s}
+.bildekort:hover{transform:translateY(-3px);box-shadow:var(--skygge-hover)}
+.bildekort img{display:block;width:100%;height:auto;background:var(--papir-2);min-height:80px}
+.bk-tekst{display:block;padding:9px 12px 11px}
+.bk-tekst b{display:block;font:600 .95rem/1.3 var(--serif)}
+.bk-tekst small{display:block;color:var(--dempet);font-size:.78rem;margin-top:2px}
+.galleri-bunn{margin-top:10px}
+.galleri-bunn .hjelp{margin-top:14px}
+.stripe{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+#forside-bilder .stripe{grid-template-columns:repeat(6,1fr);gap:10px}
+.stripe-bilde{padding:0;border:0;border-radius:8px;overflow:hidden;aspect-ratio:1;cursor:zoom-in;background:var(--papir-2);box-shadow:var(--skygge)}
+.stripe-bilde img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s;filter:sepia(.15)}
+.stripe-bilde:hover img{transform:scale(1.06);filter:none}
+#live .stripe{grid-template-columns:repeat(3,1fr);gap:6px}
+.lysboks{position:fixed;inset:0;z-index:60;background:rgba(18,14,10,.93);display:flex;align-items:center;justify-content:center;padding:30px 70px;animation:inn .18s ease}
+.lysboks figure{margin:0;max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center}
+.lysboks img{max-width:100%;max-height:calc(100vh - 190px);object-fit:contain;border-radius:4px;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#2a231b}
+.lysboks figcaption{color:#e9dfcf;max-width:760px;text-align:center;margin-top:14px;font-size:.88rem;line-height:1.45}
+.lysboks figcaption b{display:block;font:600 1.2rem var(--serif);color:#fff;margin-bottom:4px}
+.lysboks figcaption span{display:block;color:#cbbda6}
+.lysboks figcaption a{color:var(--gull)}
+.lb-lukk{position:absolute;top:14px;right:18px;width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:1.6rem;cursor:pointer}
+.lb-pil{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:2rem;line-height:1;cursor:pointer}
+.lb-lukk:hover,.lb-pil:hover{background:var(--rust)}
+.lb-forrige{left:12px}.lb-neste{right:12px}
+
+/* ---------- Kart og kilder ---------- */
+#kart{height:72vh;border-radius:var(--r);border:1px solid var(--linje);box-shadow:var(--skygge)}
+.kildegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.kildegrid .boks h3 a{text-decoration:none}
+#kildevisning h1{font-size:2.2rem;margin:0 0 .2em}
+
+.bunn{border-top:1px solid var(--linje);background:var(--papir-2)}
+.bunn p{max-width:1200px;margin:0 auto;padding:18px 24px 30px;font-size:.8rem;color:var(--dempet)}
+
+@media (max-width:980px){
+  .forside-grid,.resultat-kolonner{grid-template-columns:1fr}
+  #live{position:static;max-height:none}
+  .talband{grid-template-columns:repeat(3,1fr)}
+  .blagrid{grid-template-columns:repeat(2,1fr)}
+  #forside-bilder .stripe{grid-template-columns:repeat(4,1fr)}
+  .tips{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .talband{grid-template-columns:repeat(2,1fr)}
+  .blagrid{grid-template-columns:1fr}
+  #forside-bilder .stripe{grid-template-columns:repeat(3,1fr)}
+  .lysboks{padding:20px 10px}
+  .lb-pil{top:auto;bottom:14px;transform:none}
+  .sok button{padding:0 16px}
+  body.pa-forside .hero{min-height:560px}
+  body.pa-forside .hero-indre{padding-bottom:52px}
+  .hero-indre{padding-left:16px;padding-right:16px}
+  .sok input{font-size:.95rem;padding-left:42px}
+  .sok-ikon{left:16px}
+  .fotokreditt{font-size:.62rem;left:16px;right:16px;text-align:right}
+}
+@media print{.hero,.navlinje,#live,.bunn{display:none}}
