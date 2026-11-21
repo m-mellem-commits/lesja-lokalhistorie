@@ -28,15 +28,15 @@ h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;letter-spacin
 .hero::after{content:"";position:absolute;inset:0;z-index:-1;
   background:linear-gradient(180deg,rgba(24,18,12,.55) 0%,rgba(24,18,12,.15) 38%,rgba(24,18,12,.35) 65%,rgba(24,18,12,.82) 100%),
              linear-gradient(90deg,rgba(24,18,12,.55) 0%,rgba(24,18,12,0) 60%)}
-.hero-indre{width:100%;min-width:0;max-width:1200px;margin:0 auto;padding:20px 24px 26px;display:flex;flex-direction:column;gap:14px}
+.hero-indre{width:100%;min-width:0;max-width:1200px;margin:0 auto;padding:14px 24px 18px;display:flex;flex-direction:column;gap:14px}
 .logo{display:inline-flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-family:var(--serif);font-size:1.3rem;font-weight:600;align-self:flex-start}
 .logo:hover{color:#fff}
 .logo em{font-style:italic;font-weight:400;opacity:.9}
 .logo svg{width:34px;height:34px;color:var(--gull);filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
 .hero-tekst{display:none;max-width:720px;text-shadow:0 2px 14px rgba(0,0,0,.45)}
 .hero-overtittel{margin:0;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gull);font-weight:600}
-.hero h1{font-size:clamp(2.1rem,4.6vw,3.6rem);margin:.15em 0 .25em;font-weight:600}
-.hero-ingress{margin:0;font-size:1.12rem;max-width:56ch;color:#f3eadc}
+.hero h1{font-size:clamp(1.7rem,3.4vw,2.6rem);margin:.1em 0 .2em;font-weight:600}
+.hero-ingress{margin:0;font-size:1rem;max-width:56ch;color:#f3eadc}
 .sok{position:relative;display:flex;max-width:760px;width:100%;background:#fff;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:5px}
 .sok-ikon{position:absolute;left:20px;top:50%;width:20px;height:20px;transform:translateY(-50%);color:var(--dempet)}
 .sok input{flex:1;min-width:0;border:0;background:transparent;padding:12px 12px 12px 48px;font:500 1.02rem var(--sans);color:var(--blekk);border-radius:999px}
@@ -47,8 +47,8 @@ h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;letter-spacin
 .fotokreditt{position:absolute;right:14px;bottom:8px;font-size:.72rem;color:rgba(255,255,255,.72);text-decoration:none;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .fotokreditt:hover{color:#fff}
 
-body.pa-forside .hero{min-height:min(78vh,640px);display:flex;align-items:stretch}
-body.pa-forside .hero-indre{flex:1;justify-content:space-between;padding-top:24px;padding-bottom:70px}
+body.pa-forside .hero{min-height:min(46vh,400px);display:flex;align-items:stretch}
+body.pa-forside .hero-indre{flex:1;justify-content:space-between;padding-top:18px;padding-bottom:38px}
 body.pa-forside .hero-tekst{display:block;margin-top:auto}
 body.pa-forside .hero-bilde{background-position:center 55%}
 
@@ -217,8 +217,8 @@ mark{background:#f6dcb4;color:inherit;border-radius:2px;padding:0}
   .lysboks{padding:20px 10px}
   .lb-pil{top:auto;bottom:14px;transform:none}
   .sok button{padding:0 16px}
-  body.pa-forside .hero{min-height:560px}
-  body.pa-forside .hero-indre{padding-bottom:52px}
+  body.pa-forside .hero{min-height:400px}
+  body.pa-forside .hero-indre{padding-bottom:40px}
   .hero-indre{padding-left:16px;padding-right:16px}
   .sok input{font-size:.95rem;padding-left:42px}
   .sok-ikon{left:16px}
